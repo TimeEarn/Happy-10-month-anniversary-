@@ -175,11 +175,18 @@ function go(id){
 function startApp(){
   bg.volume = 0.3;
   bg.play().catch(()=>{});
-voice.play().then(()=>voice.pause());
+
+  /* 🔥 ปลดล็อคเสียงแบบชัวร์ */
+  voice.muted = true;
+  voice.play().then(()=>{
+    voice.pause();
+    voice.currentTime = 0;
+    voice.muted = false;
+  });
+
   go('screen2');
   initPuzzle();
 }
-
 /* fade */
 function fade(audio, target, speed=0.005){
  return new Promise(resolve=>{
@@ -337,28 +344,24 @@ async function checkCode(){
 
  document.getElementById('codeText').innerText='ถูกต้อง 💕';
 
- go('screen4');
-
 go('screen4');
 
-/* 🎬 เล่นวิดีโอ */
 playVideoSequence();
 
-/* 🔥 เล่น voice ทันที (ห้ามรอ) */
-voice.pause();
+/* 🔥 fade bg ก่อน */
+await fade(bg,0.01,0.01);
+
+/* 🔥 แล้วค่อยเล่น voice */
 voice.currentTime = 0;
-voice.volume = 0; // เริ่มเงียบ
+voice.volume = 0;
 
 try{
-  await voice.play(); // 👈 ต้องอยู่ตรงนี้
+  await voice.play();
 }catch(e){
   console.log("play blocked");
 }
 
-/* 🔥 จากนั้นค่อย fade bg ลง */
-await fade(bg,0.01,0.01);
-
-/* 🔥 แล้วค่อย fade voice ขึ้น */
+/* 🔥 fade in voice */
 let inFade=setInterval(()=>{
   if(voice.volume < 1){
     voice.volume += 0.05;
@@ -366,6 +369,7 @@ let inFade=setInterval(()=>{
     clearInterval(inFade);
   }
 },50);
+
 voice.onended=async ()=>{
   let out=setInterval(()=>{
     if(voice.volume>0){
