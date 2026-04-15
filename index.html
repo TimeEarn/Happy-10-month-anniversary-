@@ -339,26 +339,28 @@ async function checkCode(){
 
  go('screen4');
 
-/* 🔥 เล่นวิดีโอ */
+go('screen4');
+
+/* 🎬 เล่นวิดีโอ */
 playVideoSequence();
 
-/* 🔥 fade bg ก่อน */
-await fade(bg,0.01,0.01);
-
-/* 🔥 แล้วค่อยเล่น voice */
+/* 🔥 เล่น voice ทันที (ห้ามรอ) */
 voice.pause();
 voice.currentTime = 0;
-voice.volume = 0;
+voice.volume = 0; // เริ่มเงียบ
 
 try{
-  await voice.play();
+  await voice.play(); // 👈 ต้องอยู่ตรงนี้
 }catch(e){
   console.log("play blocked");
 }
 
-/* 🔥 ค่อย fade in voice */
+/* 🔥 จากนั้นค่อย fade bg ลง */
+await fade(bg,0.01,0.01);
+
+/* 🔥 แล้วค่อย fade voice ขึ้น */
 let inFade=setInterval(()=>{
-  if(voice.volume<1){
+  if(voice.volume < 1){
     voice.volume += 0.05;
   }else{
     clearInterval(inFade);
